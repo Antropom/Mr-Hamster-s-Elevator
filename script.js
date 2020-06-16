@@ -1,7 +1,8 @@
+// Creation of the Elevator class
 class Elevator {
   constructor() {
     this._minFloor = -1;
-    this._maxFloor = 15;
+    this._maxFloor = 7;
     this._currentFloor = 0;
   }
 
@@ -37,9 +38,14 @@ class Elevator {
   }
 }
 
-const elev = new Elevator();
-elev.toFloor(6);
-elev.toFloor(8);
-elev.toFloor(2);
-elev.toFloor(-1);
-elev.toFloor(22);
+// Creation of Mr Hamster's Elevator
+const HamsterElev = new Elevator();
+
+// Creation of the keyboard
+const myButtons = document.getElementById('my-buttons');
+const floors = [];
+for (let i = HamsterElev.minFloor; i <= HamsterElev.maxFloor; i++) {
+  floors.push(i);
+}
+const buttonsHTML = floors.map((floor) => `<button>${floor}</button>`).join('');
+myButtons.innerHTML = buttonsHTML;
