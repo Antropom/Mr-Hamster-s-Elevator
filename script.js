@@ -4,6 +4,7 @@ class Elevator {
     this._minFloor = minFloor;
     this._maxFloor = maxFloor;
     this._currentFloor = 0;
+    this._isMoving = false;
   }
 
   get currentFloor() {
@@ -18,23 +19,20 @@ class Elevator {
     return this._maxFloor;
   }
 
-  goUP(val) {
-    this._currentFloor += val;
-    console.log(`New Floor : ${this._currentFloor}`);
+  get isMoving() {
+    return this._isMoving;
   }
 
-  goDown(val) {
-    this._currentFloor -= val;
-    console.log(`New Floor : ${this._currentFloor}`);
+  set isMoving(bool) {
+    this._isMoving = bool;
   }
 
-  toFloor(val) {
-    const current = this._currentFloor;
-    if (val > current && val <= this._maxFloor) {
-      this.goUP(val - current);
-    } else if (val < current && val >= this._minFloor) {
-      this.goDown(current - val);
-    }
+  goUp() {
+    this._currentFloor += 1;
+  }
+
+  goDown() {
+    this._currentFloor -= 1;
   }
 }
 
@@ -44,7 +42,7 @@ const hamsterElev = new Elevator(-1, 7);
 // Creation of the keyboard
 const myButtons = document.getElementById('my-buttons');
 const floors = [];
-for (let i = hamsterElev.minFloor; i <= hamsterElev.maxFloor; i++) {
+for (let i = hamsterElev.maxFloor; i >= hamsterElev.minFloor; i--) {
   floors.push(i);
 }
 const buttonsHTML = floors
@@ -63,7 +61,46 @@ document.body.onload = modifyFloorTitle(hamsterElev.currentFloor);
 // Change current floor when clicking on the buttons
 document.querySelectorAll('.btn').forEach((button) =>
   button.addEventListener('click', () => {
-    hamsterElev.toFloor(button.innerHTML);
-    modifyFloorTitle(hamsterElev.currentFloor);
+    const current = hamsterElev.currentFloor;
+    const toFloor = button.innerHTML;
+    if (
+      toFloor > current &&
+      toFloor <= hamsterElev.maxFloor &&
+      !hamsterElev.isMoving
+    ) {
+      const elevating = (count) => {
+        hamsterElev.isMoving = true;
+        if (count < toFloor - current) {
+          setTimeout(() => {
+            count++;
+            hamsterElev.goUp();
+            modifyFloorTitle(hamsterElev.currentFloor);
+            elevating(count);
+          }, 1000);
+        } else {
+          hamsterElev.isMoving = false;
+        }
+      };
+      elevating(0);
+    } else if (
+      toFloor < current &&
+      toFloor >= hamsterElev.minFloor &&
+      !hamsterElev.isMoving
+    ) {
+      const lowering = (count) => {
+        hamsterElev.isMoving = true;
+        if (count < current - toFloor) {
+          setTimeout(() => {
+            count++;
+            hamsterElev.goDown();
+            modifyFloorTitle(hamsterElev.currentFloor);
+            lowering(count);
+          }, 1000);
+        } else {
+          hamsterElev.isMoving = false;
+        }
+      };
+      lowering(0);
+    }
   })
 );
