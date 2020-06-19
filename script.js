@@ -19,20 +19,47 @@ class Elevator {
     return this._maxFloor;
   }
 
-  get isMoving() {
-    return this._isMoving;
-  }
-
-  set isMoving(bool) {
-    this._isMoving = bool;
-  }
-
   goUp() {
     this._currentFloor += 1;
   }
 
   goDown() {
     this._currentFloor -= 1;
+  }
+
+  toFloor(val) {
+    const current = this._currentFloor;
+    if (val > current && val <= this._maxFloor && !this._isMoving) {
+      const elevating = (count) => {
+        this._isMoving = true;
+        if (count < val - current) {
+          setTimeout(() => {
+            count++;
+            this.goUp();
+            modifyFloorTitle(hamsterElev.currentFloor);
+            elevating(count);
+          }, 1000);
+        } else {
+          this._isMoving = false;
+        }
+      };
+      elevating(0);
+    } else if (val < current && val >= this._minFloor && !this._isMoving) {
+      const lowering = (count) => {
+        this._isMoving = true;
+        if (count < current - val) {
+          setTimeout(() => {
+            count++;
+            this.goDown();
+            modifyFloorTitle(hamsterElev.currentFloor);
+            lowering(count);
+          }, 1000);
+        } else {
+          this._isMoving = false;
+        }
+      };
+      lowering(0);
+    }
   }
 }
 
@@ -61,46 +88,6 @@ document.body.onload = modifyFloorTitle(hamsterElev.currentFloor);
 // Change current floor when clicking on the buttons
 document.querySelectorAll('.btn').forEach((button) =>
   button.addEventListener('click', () => {
-    const current = hamsterElev.currentFloor;
-    const toFloor = button.innerHTML;
-    if (
-      toFloor > current &&
-      toFloor <= hamsterElev.maxFloor &&
-      !hamsterElev.isMoving
-    ) {
-      const elevating = (count) => {
-        hamsterElev.isMoving = true;
-        if (count < toFloor - current) {
-          setTimeout(() => {
-            count++;
-            hamsterElev.goUp();
-            modifyFloorTitle(hamsterElev.currentFloor);
-            elevating(count);
-          }, 1000);
-        } else {
-          hamsterElev.isMoving = false;
-        }
-      };
-      elevating(0);
-    } else if (
-      toFloor < current &&
-      toFloor >= hamsterElev.minFloor &&
-      !hamsterElev.isMoving
-    ) {
-      const lowering = (count) => {
-        hamsterElev.isMoving = true;
-        if (count < current - toFloor) {
-          setTimeout(() => {
-            count++;
-            hamsterElev.goDown();
-            modifyFloorTitle(hamsterElev.currentFloor);
-            lowering(count);
-          }, 1000);
-        } else {
-          hamsterElev.isMoving = false;
-        }
-      };
-      lowering(0);
-    }
+    hamsterElev.toFloor(button.innerHTML);
   })
 );
