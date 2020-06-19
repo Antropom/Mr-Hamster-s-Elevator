@@ -32,30 +32,34 @@ class Elevator {
     if (val > current && val <= this._maxFloor && !this._isMoving) {
       const elevating = (count) => {
         this._isMoving = true;
+        showLoader();
         if (count < val - current) {
           setTimeout(() => {
             count++;
             this.goUp();
-            modifyFloorTitle(hamsterElev.currentFloor);
+            modifyFloorTitle(this._currentFloor);
             elevating(count);
           }, 1000);
         } else {
           this._isMoving = false;
+          hideLoader();
         }
       };
       elevating(0);
     } else if (val < current && val >= this._minFloor && !this._isMoving) {
       const lowering = (count) => {
         this._isMoving = true;
+        showLoader();
         if (count < current - val) {
           setTimeout(() => {
             count++;
             this.goDown();
-            modifyFloorTitle(hamsterElev.currentFloor);
+            modifyFloorTitle(this._currentFloor);
             lowering(count);
           }, 1000);
         } else {
           this._isMoving = false;
+          hideLoader();
         }
       };
       lowering(0);
@@ -82,8 +86,12 @@ const modifyFloorTitle = (floor) => {
   const title = document.getElementById('title');
   title.innerHTML = `You're currently on the floor : ${floor}`;
 };
-
 document.body.onload = modifyFloorTitle(hamsterElev.currentFloor);
+
+// Loader
+const loader = document.querySelector('.loader');
+const showLoader = () => loader.classList.add('visible');
+const hideLoader = () => loader.classList.remove('visible');
 
 // Change current floor when clicking on the buttons
 document.querySelectorAll('.btn').forEach((button) =>
